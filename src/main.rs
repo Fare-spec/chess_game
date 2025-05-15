@@ -1,5 +1,5 @@
-use std::vec;
 use colored::{ColoredString, Colorize};
+use std::vec;
 
 #[derive(Debug)]
 struct Board {
@@ -31,18 +31,18 @@ fn main() {
 impl Piece {
     fn to_char(&self) -> ColoredString {
         match *self {
-            Piece::Pawn(Color::White)   => '♙'.to_string().white().bold().on_black(),
-            Piece::Pawn(Color::Black)   => '♙'.to_string().bright_black().bold().on_black(),
+            Piece::Pawn(Color::White) => '♙'.to_string().white().bold().on_black(),
+            Piece::Pawn(Color::Black) => '♙'.to_string().bright_black().bold().on_black(),
             Piece::Knight(Color::White) => '♘'.to_string().white().bold().on_black(),
             Piece::Knight(Color::Black) => '♘'.to_string().bright_black().bold().on_black(),
             Piece::Bishop(Color::White) => '♗'.to_string().white().bold().on_black(),
             Piece::Bishop(Color::Black) => '♗'.to_string().bright_black().bold().on_black(),
-            Piece::Rook(Color::White)   => '♖'.to_string().white().bold().on_black(),
-            Piece::Rook(Color::Black)   => '♖'.to_string().bright_black().bold().on_black(),
-            Piece::Queen(Color::White)  => '♕'.to_string().white().bold().on_black(),
-            Piece::Queen(Color::Black)  => '♕'.to_string().bright_black().bold().on_black(),
-            Piece::King(Color::White)   => '♔'.to_string().white().bold().on_black(),
-            Piece::King(Color::Black)   => '♔'.to_string().bright_black().bold().on_black(),
+            Piece::Rook(Color::White) => '♖'.to_string().white().bold().on_black(),
+            Piece::Rook(Color::Black) => '♖'.to_string().bright_black().bold().on_black(),
+            Piece::Queen(Color::White) => '♕'.to_string().white().bold().on_black(),
+            Piece::Queen(Color::Black) => '♕'.to_string().bright_black().bold().on_black(),
+            Piece::King(Color::White) => '♔'.to_string().white().bold().on_black(),
+            Piece::King(Color::Black) => '♔'.to_string().bright_black().bold().on_black(),
         }
     }
 }
@@ -96,5 +96,35 @@ impl Board {
             }
             println!();
         }
+    }
+    fn get_fcolors(&self, color: Color) -> Vec<Vec<u8>> {
+        let pieces_d: Vec<Vec<u8>>;
+        let it: u8 = 0;
+        let yt: u8 = 0;
+        for i in self.squares {
+            it += 1;
+            for j in i {
+                yt += 1;
+                if j(c) == color {
+                    pieces_d.push([it, yt].to_vec());
+                };
+            }
+        }
+        pieces_d
+    }
+    fn get_fpiece(piece: Piece) -> Vec<Option<Vec<u8>>> {
+        let coo: Vec<Option<Vec<u8>>>;
+        let it: u8 = 0;
+        let yt: u8 = 0;
+        for i in self.squares {
+            it += 1;
+            for j in i {
+                yt += 1;
+                if j == piece {
+                    coo.push(Option<[it, yt].to_vec()>);
+                };
+            }
+        }
+        pieces_d
     }
 }
