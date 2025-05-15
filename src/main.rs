@@ -1,4 +1,5 @@
 use std::vec;
+use colored::{ColoredString, Colorize};
 
 #[derive(Debug)]
 struct Board {
@@ -27,6 +28,24 @@ fn main() {
     chess_board.fill();
     chess_board.print_board();
 }
+impl Piece {
+    fn to_char(&self) -> ColoredString {
+        match *self {
+            Piece::Pawn(Color::White)   => '♙'.to_string().white().bold().on_black(),
+            Piece::Pawn(Color::Black)   => '♙'.to_string().bright_black().bold().on_black(),
+            Piece::Knight(Color::White) => '♘'.to_string().white().bold().on_black(),
+            Piece::Knight(Color::Black) => '♘'.to_string().bright_black().bold().on_black(),
+            Piece::Bishop(Color::White) => '♗'.to_string().white().bold().on_black(),
+            Piece::Bishop(Color::Black) => '♗'.to_string().bright_black().bold().on_black(),
+            Piece::Rook(Color::White)   => '♖'.to_string().white().bold().on_black(),
+            Piece::Rook(Color::Black)   => '♖'.to_string().bright_black().bold().on_black(),
+            Piece::Queen(Color::White)  => '♕'.to_string().white().bold().on_black(),
+            Piece::Queen(Color::Black)  => '♕'.to_string().bright_black().bold().on_black(),
+            Piece::King(Color::White)   => '♔'.to_string().white().bold().on_black(),
+            Piece::King(Color::Black)   => '♔'.to_string().bright_black().bold().on_black(),
+        }
+    }
+}
 impl Board {
     fn new() -> Board {
         Board {
@@ -38,15 +57,14 @@ impl Board {
         // White pieces
         {
             self.squares[0][0] = Some(Piece::Rook(Color::White));
-            self.squares[0][1] = Some(Piece::Rook(Color::White));
-            self.squares[0][2] = Some(Piece::Rook(Color::White));
-            self.squares[0][3] = Some(Piece::Rook(Color::White));
-            self.squares[0][4] = Some(Piece::Rook(Color::White));
-            self.squares[0][5] = Some(Piece::Rook(Color::White));
-            self.squares[0][6] = Some(Piece::Rook(Color::White));
+            self.squares[0][1] = Some(Piece::Knight(Color::White));
+            self.squares[0][2] = Some(Piece::Bishop(Color::White));
+            self.squares[0][3] = Some(Piece::Queen(Color::White));
+            self.squares[0][4] = Some(Piece::King(Color::White));
+            self.squares[0][5] = Some(Piece::Bishop(Color::White));
+            self.squares[0][6] = Some(Piece::Knight(Color::White));
             self.squares[0][7] = Some(Piece::Rook(Color::White));
             //Pawn
-            let i: usize;
             for i in 0..8 {
                 self.squares[1][i] = Some(Piece::Pawn(Color::White));
             }
@@ -54,29 +72,29 @@ impl Board {
         // Black pieces
         {
             self.squares[7][0] = Some(Piece::Rook(Color::Black));
-            self.squares[7][1] = Some(Piece::Rook(Color::Black));
-            self.squares[7][2] = Some(Piece::Rook(Color::Black));
-            self.squares[7][3] = Some(Piece::Rook(Color::Black));
-            self.squares[7][4] = Some(Piece::Rook(Color::Black));
-            self.squares[7][5] = Some(Piece::Rook(Color::Black));
-            self.squares[7][6] = Some(Piece::Rook(Color::Black));
+            self.squares[7][1] = Some(Piece::Knight(Color::Black));
+            self.squares[7][2] = Some(Piece::Bishop(Color::Black));
+            self.squares[7][3] = Some(Piece::Queen(Color::Black));
+            self.squares[7][4] = Some(Piece::King(Color::Black));
+            self.squares[7][5] = Some(Piece::Bishop(Color::Black));
+            self.squares[7][6] = Some(Piece::Knight(Color::Black));
             self.squares[7][7] = Some(Piece::Rook(Color::Black));
-            let i: usize;
             for i in 0..8 {
                 self.squares[6][i] = Some(Piece::Pawn(Color::Black));
             }
         }
     }
-    pub fn print_board(&self) {
-        for row in self.squares.iter().rev() {
-            println!();
-            println!();
-            println!();
 
+    fn print_board(&self) {
+        for row in self.squares.iter().rev() {
             for cell in row {
-                print!("{:?}\t", cell);
+                let symbol = match cell {
+                    Some(piece) => piece.to_char(),
+                    None => '🟥'.to_string().red(),
+                };
+                print!("{}\t", symbol);
             }
+            println!();
         }
-        println!()
     }
 }
