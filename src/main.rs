@@ -1,12 +1,16 @@
 use colored::{ColoredString, Colorize};
 use std::vec;
 
+struct coordinate {
+    x: usize,
+    y: usize,
+}
 #[derive(Debug)]
 struct Board {
     squares: Vec<Vec<Option<Piece>>>,
     side_to_move: Color,
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 
 enum Piece {
     Pawn(Color),
@@ -16,7 +20,7 @@ enum Piece {
     Queen(Color),
     King(Color),
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 enum Color {
     White,
     Black,
@@ -43,6 +47,17 @@ impl Piece {
             Piece::Queen(Color::Black) => '♕'.to_string().bright_black().bold().on_black(),
             Piece::King(Color::White) => '♔'.to_string().white().bold().on_black(),
             Piece::King(Color::Black) => '♔'.to_string().bright_black().bold().on_black(),
+        }
+    }
+
+    fn get_color(&self) -> &Color {
+        match self {
+            Piece::Pawn(color) => color,
+            Piece::Rook(color) => color,
+            Piece::Knight(color) => color,
+            Piece::Bishop(color) => color,
+            Piece::Queen(color) => color,
+            Piece::King(color) => color,
         }
     }
 }
@@ -98,33 +113,34 @@ impl Board {
         }
     }
     fn get_fcolors(&self, color: Color) -> Vec<Vec<u8>> {
-        let pieces_d: Vec<Vec<u8>>;
-        let it: u8 = 0;
-        let yt: u8 = 0;
-        for i in self.squares {
+        let mut pieces_d: Vec<Vec<u8>> = Vec::new();
+        let mut it: u8 = 0;
+        let mut yt: u8 = 0;
+        for i in &self.squares {
             it += 1;
             for j in i {
+                let piece = j.clone().unwrap();
                 yt += 1;
-                if j(c) == color {
+                if piece.get_color() == &color {
                     pieces_d.push([it, yt].to_vec());
                 };
             }
         }
         pieces_d
     }
-    fn get_fpiece(piece: Piece) -> Vec<Option<Vec<u8>>> {
-        let coo: Vec<Option<Vec<u8>>>;
-        let it: u8 = 0;
-        let yt: u8 = 0;
-        for i in self.squares {
+    fn get_fpiece(&self,piece: Piece) -> Vec<Option<Vec<u8>>> {
+        let mut coo: Vec<Option<Vec<u8>>> = Vec::new();
+        let mut it: u8 = 0;
+        let mut yt: u8 = 0;
+        for i in &self.squares {
             it += 1;
             for j in i {
                 yt += 1;
-                if j == piece {
-                    coo.push(Option<[it, yt].to_vec()>);
+                if j.clone().unwrap()== piece {
+                    coo.push(Some([it, yt].to_vec()));
                 };
             }
         }
-        pieces_d
+        coo
     }
 }
