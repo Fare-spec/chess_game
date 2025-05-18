@@ -1,7 +1,8 @@
 use colored::{ColoredString, Colorize};
 use std::vec;
-
-struct coordinate {
+mod tests;
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct Coordinate {
     x: usize,
     y: usize,
 }
@@ -31,6 +32,14 @@ fn main() {
     let mut chess_board = Board::new();
     chess_board.fill();
     chess_board.print_board();
+}
+impl Coordinate {
+    fn new(x: usize, y: usize) -> Self {
+        Self { x, y }
+    }
+    fn is_valid(&self) -> bool {
+        return self.x < 8 && self.y < 8;
+    }
 }
 impl Piece {
     fn to_char(&self) -> ColoredString {
@@ -112,35 +121,105 @@ impl Board {
             println!();
         }
     }
-    fn get_fcolors(&self, color: Color) -> Vec<Vec<u8>> {
-        let mut pieces_d: Vec<Vec<u8>> = Vec::new();
-        let mut it: u8 = 0;
-        let mut yt: u8 = 0;
-        for i in &self.squares {
-            it += 1;
-            for j in i {
-                let piece = j.clone().unwrap();
-                yt += 1;
-                if piece.get_color() == &color {
-                    pieces_d.push([it, yt].to_vec());
-                };
+    fn get_fcolors(&self, color: Color) -> Vec<Coordinate> {
+        let mut result = Vec::new();
+        for (y, row) in self.squares.iter().enumerate() {
+            for (x, cell) in row.iter().enumerate() {
+                if let Some(piece) = cell {
+                    if piece.get_color() == &color {
+                        result.push(Coordinate { x, y });
+                    }
+                }
             }
         }
-        pieces_d
+        result
     }
-    fn get_fpiece(&self,piece: Piece) -> Vec<Option<Vec<u8>>> {
-        let mut coo: Vec<Option<Vec<u8>>> = Vec::new();
-        let mut it: u8 = 0;
-        let mut yt: u8 = 0;
-        for i in &self.squares {
-            it += 1;
-            for j in i {
-                yt += 1;
-                if j.clone().unwrap()== piece {
-                    coo.push(Some([it, yt].to_vec()));
-                };
+    fn get_fpiece(&self, piece: Piece) -> Vec<Coordinate> {
+        let mut positions = Vec::new();
+        for (y, row) in self.squares.iter().enumerate() {
+            for (x, cell) in row.iter().enumerate() {
+                if let Some(p) = cell {
+                    if *p == piece {
+                        positions.push(Coordinate { x, y });
+                    }
+                }
             }
         }
-        coo
+        positions
+    }
+    fn get_fcoordinates(&self, coo: &Coordinate) -> &Option<Piece> {
+        &self.squares[coo.y][coo.x]
+    }
+    fn verify_pawn(&self, departure: Coordinate, destination: Coordinate, color: Color) -> bool {
+        // out of the board
+        if !destination.is_valid() || !departure.is_valid() {
+            return false;
+        }
+
+        let dx = destination.x as isize - departure.x as isize;
+        let dy = destination.y as isize - departure.y as isize;
+
+        match color {
+            Color::White => {
+                // simple forward
+                if dx == 0 && dy == 1 {
+                    return self.squares[destination.y][destination.x].is_none();
+                }
+
+                // first move  (2 steps forward max)
+                if dx == 0 && dy == 2 && departure.y == 1 {
+                    return self.squares[departure.y + 1][departure.x].is_none()
+                        && self.squares[destination.y][destination.x].is_none();
+                }
+
+                // Diagonal capture
+                if dy == 1 && dx.abs() == 1 {
+                    if let Some(p) = &self.squares[destination.y][destination.x] {
+                        return p.get_color() != &color;
+                    }
+                }
+
+                false
+            }
+
+            Color::Black => {
+                if dx == 0 && dy == -1 {
+                    return self.squares[destination.y][destination.x].is_none();
+                }
+
+                if dx == 0 && dy == -2 && departure.y == 6 {
+                    return self.squares[departure.y - 1][departure.x].is_none()
+                        && self.squares[destination.y][destination.x].is_none();
+                }
+
+                if dy == -1 && dx.abs() == 1 {
+                    if let Some(p) = &self.squares[destination.y][destination.x] {
+                        return p.get_color() != &color;
+                    }
+                }
+
+                false
+            }
+        }
+    }
+
+    fn verify_move(&self, departure: Coordinate, destination: Coordinate) -> bool {
+        let piece_opt = self.get_fcoordinates(&departure);
+        if let Some(piece) = piece_opt {
+            match piece {
+                Piece::Pawn(color) => self.verify_pawn(departure, destination, color.clone()),
+                Piece::Rook(_) => todo!(),
+                Piece::Knight(_) => todo!(),
+                Piece::Bishop(_) => todo!(),
+                Piece::King(_) => todo!(),
+                Piece::Queen(_) => todo!(),
+            }
+        } else {
+            false
+        }
+    }
+
+    fn move_piece(&mut self, departure: Coordinate, destination: Coordinate) {
+        todo!()
     }
 }
